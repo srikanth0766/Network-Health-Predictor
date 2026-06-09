@@ -33,6 +33,36 @@
       ::-webkit-scrollbar-thumb:hover {
         background: #444;
       }
+      .nav-container {
+        display: flex;
+        gap: 1rem;
+        padding: 0 1.5rem;
+        height: 36px;
+        align-items: center;
+        border-bottom: 1px solid #222;
+        background-color: #0a0a0a;
+      }
+      .nav-btn {
+        background: none;
+        color: #666;
+        border: 1px solid #333;
+        padding: 4px 12px;
+        font-size: 10px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        cursor: pointer;
+        font-family: 'IBM Plex Mono', monospace;
+        transition: all 0.2s ease;
+      }
+      .nav-btn:hover {
+        color: #fff;
+        border-color: #666;
+      }
+      .nav-btn.active {
+        background-color: #fff;
+        color: #000;
+        border-color: #fff;
+      }
     </style>
   </head>
   <body>
