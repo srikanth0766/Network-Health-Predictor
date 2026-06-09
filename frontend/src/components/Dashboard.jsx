@@ -6,6 +6,7 @@ import AlertPanel from './AlertPanel.jsx';
 import Charts from './Charts.jsx';
 
 export default function Dashboard({ user, onLogout }) {
+  const [activeTab, setActiveTab] = useState('monitor');
   const [wsStatus, setWsStatus] = useState('CONNECTING');
   const [metrics, setMetrics] = useState(null);
   const [prediction, setPrediction] = useState(null);
@@ -386,6 +387,22 @@ export default function Dashboard({ user, onLogout }) {
         </div>
       </header>
 
+      {/* Navigation Bar */}
+      <nav className="nav-container">
+        <button
+          className={`nav-btn ${activeTab === 'monitor' ? 'active' : ''}`}
+          onClick={() => setActiveTab('monitor')}
+        >
+          Health Monitor
+        </button>
+        <button
+          className={`nav-btn ${activeTab === 'predictions' ? 'active' : ''}`}
+          onClick={() => setActiveTab('predictions')}
+        >
+          Predictions & Insights
+        </button>
+      </nav>
+
       {/* Alert Banner */}
       {prediction && prediction.probability > 80 && (
         <div style={alertBannerStyle}>
@@ -396,78 +413,86 @@ export default function Dashboard({ user, onLogout }) {
 
       {/* Main Grid Content */}
       <main style={mainContentStyle}>
-        {/* Row 1: Health Score + Metrics Cards */}
-        <section style={firstRowStyle}>
-          <div style={healthScorePanelStyle}>
-            <div style={healthScoreLabelStyle}>HEALTH SCORE</div>
-            <div style={healthScoreNumStyle}>{metrics ? health.score : '—'}</div>
-            <div style={healthScoreStatusStyle}>{metrics ? health.label : 'LOADING'}</div>
-          </div>
-          <div style={metricsGridStyle}>
-            <MetricsCard
-              label="LATENCY"
-              value={metrics?.latency_ms}
-              unit="ms"
-              warn={metrics?.latency_ms > 80}
-            />
-            <MetricsCard
-              label="PACKET LOSS"
-              value={metrics?.packet_loss_percent}
-              unit="%"
-              warn={metrics?.packet_loss_percent > 3}
-            />
-            <MetricsCard
-              label="BANDWIDTH"
-              value={metrics?.bandwidth_usage_percent}
-              unit="%"
-              warn={metrics?.bandwidth_usage_percent > 85}
-            />
-            <MetricsCard
-              label="USERS"
-              value={metrics?.connected_users}
-              unit=""
-              warn={metrics?.connected_users > 150}
-            />
-            <MetricsCard
-              label="CPU"
-              value={metrics?.cpu_usage_percent}
-              unit="%"
-              warn={metrics?.cpu_usage_percent > 85}
-            />
-          </div>
-        </section>
-
-        {/* Row 2: Prediction + (Admin Only) Recommendations */}
-        <section style={secondRowStyle}>
-          <PredictionPanel prediction={prediction} />
-          {user.role === 'admin' && (
-            <div style={recommendationsPanelStyle}>
-              <div style={panelHeaderStyle}>RECOMMENDATIONS</div>
-              <div style={{ flex: 1 }}>
-                {recs.length > 0 ? (
-                  recs.map((item, index) => (
-                    <div key={index} style={recommendationItemStyle}>
-                      {item.text}
-                    </div>
-                  ))
-                ) : (
-                  <div style={emptyRecommendationsStyle}>No active recommendations.</div>
-                )}
+        {activeTab === 'monitor' && (
+          <>
+            {/* Row 1: Health Score + Metrics Cards */}
+            <section style={firstRowStyle}>
+              <div style={healthScorePanelStyle}>
+                <div style={healthScoreLabelStyle}>HEALTH SCORE</div>
+                <div style={healthScoreNumStyle}>{metrics ? health.score : '—'}</div>
+                <div style={healthScoreStatusStyle}>{metrics ? health.label : 'LOADING'}</div>
               </div>
-            </div>
-          )}
-        </section>
+              <div style={metricsGridStyle}>
+                <MetricsCard
+                  label="LATENCY"
+                  value={metrics?.latency_ms}
+                  unit="ms"
+                  warn={metrics?.latency_ms > 80}
+                />
+                <MetricsCard
+                  label="PACKET LOSS"
+                  value={metrics?.packet_loss_percent}
+                  unit="%"
+                  warn={metrics?.packet_loss_percent > 3}
+                />
+                <MetricsCard
+                  label="BANDWIDTH"
+                  value={metrics?.bandwidth_usage_percent}
+                  unit="%"
+                  warn={metrics?.bandwidth_usage_percent > 85}
+                />
+                <MetricsCard
+                  label="USERS"
+                  value={metrics?.connected_users}
+                  unit=""
+                  warn={metrics?.connected_users > 150}
+                />
+                <MetricsCard
+                  label="CPU"
+                  value={metrics?.cpu_usage_percent}
+                  unit="%"
+                  warn={metrics?.cpu_usage_percent > 85}
+                />
+              </div>
+            </section>
 
-        {/* Row 3: Charts */}
-        <section>
-          <Charts history={history} />
-        </section>
+            {/* Row 3: Charts */}
+            <section>
+              <Charts history={history} />
+            </section>
+          </>
+        )}
 
-        {/* Row 4: Alert Log (Admin Only) */}
-        {user.role === 'admin' && (
-          <section>
-            <AlertPanel alerts={alerts} />
-          </section>
+        {activeTab === 'predictions' && (
+          <>
+            {/* Row 2: Prediction + (Admin Only) Recommendations */}
+            <section style={secondRowStyle}>
+              <PredictionPanel prediction={prediction} />
+              {user.role === 'admin' && (
+                <div style={recommendationsPanelStyle}>
+                  <div style={panelHeaderStyle}>RECOMMENDATIONS</div>
+                  <div style={{ flex: 1 }}>
+                    {recs.length > 0 ? (
+                      recs.map((item, index) => (
+                        <div key={index} style={recommendationItemStyle}>
+                          {item.text}
+                        </div>
+                      ))
+                    ) : (
+                      <div style={emptyRecommendationsStyle}>No active recommendations.</div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* Row 4: Alert Log (Admin Only) */}
+            {user.role === 'admin' && (
+              <section>
+                <AlertPanel alerts={alerts} />
+              </section>
+            )}
+          </>
         )}
       </main>
     </div>
